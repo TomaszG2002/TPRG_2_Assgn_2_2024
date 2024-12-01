@@ -1,0 +1,45 @@
+#This Client runs on the pc 
+#Tomasz Giedrojc - 100793058
+#Added my own work with the given code
+
+import socket
+import json
+
+# Create a socket object
+s = socket.socket()
+
+# Replace with your server's IP address and port
+host = "10.102.13.61"
+port = 5000
+
+try:
+    # Connect to the server
+    s.connect((host, port))
+    print(f"Connected to server at {host}:{port}")
+    
+    # Receive the data from the server
+    data = s.recv(1024)  # Receives up to 1024 bytes of data
+    
+    # Decode the received bytes to string
+    data_str = data.decode('utf-8')
+    
+    # Parse the string as JSON
+    data_json = json.loads(data_str)
+    
+    # Display the received data
+    print("Server Data:")
+    for key, value in data_json.items():
+        # Append 'MHz' only to the clock frequencies
+        if "Clock Frequency" in key:
+            print(f"{key}: {value} MHz")
+        elif "Voltage" in key:
+            print(f"{key}: {value} V")  # Add 'V' for voltage
+        elif "Temperature" in key:
+            print(f"{key}: {value} °C")  # Add '°C' for temperature
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+finally:
+    # Close the connection
+    s.close()
+
