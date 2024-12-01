@@ -1,1 +1,42 @@
+#This server runs on pi
+#Tomasz Giedrojc - 100793058
+#Added my own work with the given code
+
+import os, socket, json
+
+def get_core_temp():
+    temp = os.popen('vcgencmd measure_temp').readline()
+    return round(float(temp.split('=')[1].strip('\'C\n')))
+
+def get_gpu_volts():
+    volts = os.popen('vcgencmd measure_volts core').readline()
+    return round(float(volts.split('=')[1].strip('V\n')),1)
+
+def get_arm_clock():
+    clock = os.popen('vcgencmd measure_clock arm').readline()
+    return round(int(clock.split('=')[1].strip())/ 1000000)
+
+def get_hdmi_clock():
+    clock = os.popen('vcgencmd measure_clock hdmi').readline()
+    return round(int(clock.split('=')[1].strip())/ 1000000)
+
+s = socket.socket()
+host = ''  # Localhost
+port = 5000
+s.bind((host,port))
+s.listen(5)
+
+while True:
+    c, addr = s.accept()
+    print('Got connection from', addr)
+    data = {
+        "Core Temperature (°C)": get_core_temp(),
+        "GPU Voltage (V)": get_gpu_volts(),
+        "ARM Clock Frequency (MHz)": get_arm_clock(),
+        "HDMI Clock Frequency (MHz)": get_hdmi_clock(),
+    }
+    res = json.dumps(data).encode('utf-8')
+    c.send(res)
+    c.close()
+
 
